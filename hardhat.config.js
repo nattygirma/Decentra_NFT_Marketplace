@@ -3,8 +3,7 @@
 require("@nomiclabs/hardhat-waffle");
 const fs = require("fs");
 
-const infuraUrl = process.env.REACT_APP_INFURA_API_URL;
-// const privateKey = process.env.REACT_APP_PRIVATE_KEY;
+const infuraUrl = process.env.NEXT_PUBLIC_INFURA_API_UR;
 
 
 const privateKey =fs.readFileSync(".secret").toString().trim() || "01234567890123456789";

@@ -15,9 +15,11 @@ const CRYPTO_CURRENCY = "ether";
 
 const INFURA_URL = "infura-ipfs.io";
 
-const PROJECT_ID = "e302ec24bdea44b3991eee0c5b9c3e9e";
+const PROJECT_ID = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID;
 
-const IPFS_PROJECT_ID = "2GgppF5yYglg27BOq3owkFXMnS4";
+
+const IPFS_PROJECT_ID =process.env.NEXT_PUBLIC_INFURA_IPFS_PROJECT_ID;
+
 
 const ACTION_TYPES = {
   LIST_ITEM: "list_item",

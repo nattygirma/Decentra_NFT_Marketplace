@@ -53,7 +53,6 @@ export default function CreateItem({ ipfsApiKey }) {
     if (!active) {
       return setIsWalletPanelOpen(true);
     }
-
     const data = JSON.stringify({
       name,
       description,
