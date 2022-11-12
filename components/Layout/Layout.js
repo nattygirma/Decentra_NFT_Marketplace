@@ -21,11 +21,12 @@ import { changeNetwork } from "../../utils/wallet";
 
 import { HEADER_ROUTES } from "../../utils/constants";
 
-const { HOME, CREATE_ITEM, MY_ASSETS, CREATOR_DASHBOARD, AUTHENTICATE } = HEADER_ROUTES;
+const { HOME, CREATE_ITEM, MY_ASSETS, CREATOR_DASHBOARD, AUTHENTICATE, CREATE_COLLECTION } = HEADER_ROUTES;
 
 const navOptions = [
   { route: HOME, label: "Home" },
   { route: CREATE_ITEM, label: "Create digital asset" },
+  { route: CREATE_COLLECTION, label: "Create collection" },
   { route: MY_ASSETS, label: "My digital assets" },
   { route: CREATOR_DASHBOARD, label: "Creator dashboard" },
   { route: AUTHENTICATE, label: "Authenticate" },

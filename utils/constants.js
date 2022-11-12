@@ -1,6 +1,7 @@
 const HEADER_ROUTES = {
   HOME: "/",
   CREATE_ITEM: "/create-item",
+  CREATE_COLLECTION: "/create-collection",
   MY_ASSETS: "/my-assets",
   CREATOR_DASHBOARD: "/creator-dashboard",
   AUTHENTICATE: "/authenticate",

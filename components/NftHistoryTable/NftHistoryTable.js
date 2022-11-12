@@ -1,9 +1,11 @@
 import { useMemo } from "react";
+import moment from "moment";
 import PropTypes from "prop-types";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import Table from "../shared/Table/Table";
 import shortenWalletAddress from "../../utils/shortenWalletAddress";
+
 
 import maticIcon from "../../assets/images/polygon-matic.svg";
 
@@ -25,12 +27,22 @@ const propTypes = {
 };
 
 const NftHistoryTable = ({ data }) => {
+  console.log("Data: ",data);
   const columns = useMemo(
     () => [
       {
         Header: "Event",
         accessor: "sold",
         Cell: ({ value }) => <div>{value ? "Sold" : "Listed"}</div>,
+      },
+      {
+        Header: "Listed time",
+        accessor: "timeItemGotListed",
+        Cell: ({ value }) => (
+          <div className="flex">
+            <p>{moment(value * 1000).format("MMMM Do YYYY h:mma")}</p>
+          </div>
+        ),
       },
       {
         Header: "Price",
@@ -64,6 +76,20 @@ const NftHistoryTable = ({ data }) => {
             >
               {isListed ? "--" : shortenWalletAddress(value)}
             </button>
+          );
+        },
+      },
+      {
+        Header: "Sold time",
+        accessor: "timeItemGotSold",
+        Cell: ({ value }) => {
+          const isListed = value === 0;
+          return (
+            <p>
+              {isListed
+                ? "--"
+                : moment(value * 1000).format("MMMM Do YYYY h:mma")}
+            </p>
           );
         },
       },

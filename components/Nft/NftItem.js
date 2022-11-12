@@ -14,6 +14,7 @@ import useGetMarketNftHistory from "../../hooks/queries/useGetMarketNftHistory";
 
 import useRemoveListedNft from "../../hooks/mutations/useRemoveListedNft";
 import useBuyNft from "../../hooks/mutations/useBuyNft";
+import useTransferNft from "../../hooks/mutations/useTransferNft";
 import useListNft from "../../hooks/mutations/useListNft";
 
 import useToggleWalletPanel from "../../hooks/contexts/useToggleWalletPanel";
@@ -49,6 +50,7 @@ const NftItem = ({ nftId }) => {
   const { removeListingNftMutation, isLoading: isRemoveLoading } =
     useRemoveListedNft();
   const { buyNftMutation, isLoading: isBuyLoading } = useBuyNft();
+   const { transferNftMutation, isLoading: isTransferLoading } = useTransferNft();
   const { listNftMutation, isLoading: isListLoading } = useListNft();
 
   const isLoading =
@@ -65,7 +67,7 @@ const NftItem = ({ nftId }) => {
   const currentMarketListing =
     marketNftHistory[marketNftHistory.length - 1] || {};
 
-  const { price, sold, itemId, seller } = currentMarketListing;
+  const { price, sold, itemId, seller, owner } = currentMarketListing;
 
   const hasBeenListed = !!Object.keys(currentMarketListing).length;
 
@@ -85,12 +87,22 @@ const NftItem = ({ nftId }) => {
   const isOwner = getIsOwner();
   // canListItem is true if the item has never been listed before and isOwner
   // or is owner and item is currently not for sale
+                                             // sold and isowner means item is sold to me
   const canListItem = (!itemId && isOwner) || (isOwner && sold);
   //  canRemoveItem is true only if user is logged in, there is an item, is not sold and seller is the owner
   const canRemoveItem = !!active && !sold && !!itemId && isOwner;
 
+  const canTransferItem = (!sold && isOwner) && !canListItem;
+
   const shouldShowPrice = hasBeenListed && !sold && !canListItem;
 
+  // function handleTry() {
+  //   console.log("canListItem: ", canListItem);
+  //   console.log("canRemoveItem: ", canRemoveItem);
+  //   console.log("canTransferItem: ", canTransferItem);
+  //   console.log("active: ",active," sold: ",sold," isOwner: ",isOwner, "itemId:",itemId);
+  //   console.log("Seller: ",seller," owner: ",owner);
+  // }
   useEffect(() => {
     if (canListItem) {
       return setAction(LIST_ITEM);
@@ -101,14 +113,15 @@ const NftItem = ({ nftId }) => {
     return setAction(BUY);
   }, [canListItem, canRemoveItem]);
 
-  const handleBuy = () => {
-    if (!active) {
-      // Opens wallet panel for user to connect wallet before making a purchase
-      return setIsWalletPanelOpen(true);
-    }
-    return buyNftMutation({ itemId, price });
-  };
+    const handleBuy = () => {
+      if (!active) {
+        // Opens wallet panel for user to connect wallet before making a purchase
+        return setIsWalletPanelOpen(true);
+      }
+      return buyNftMutation({ itemId, price });
+    };
 
+  
   const actions = {
     [LIST_ITEM]: {
       label: "List item",
@@ -140,15 +153,33 @@ const NftItem = ({ nftId }) => {
     );
   }
 
+
+    const handleTransfer = (buyersAddress) => {
+          if (!active) {
+            // Opens wallet panel for user to connect wallet before making a purchase
+            return setIsWalletPanelOpen(true);
+          }
+          console.log(buyersAddress, " -- ", nftId);
+          return transferNftMutation( 1, buyersAddress );
+        };
+
   const handleSubmit = (values) => {
     actions[action].action(String(values.price)).then(() => {
       refetchNft();
       refetchHistory();
     });
   };
+  const handleSubmit1 = (values) => {
+      const buyersAddress = String(values.buyersAddress);
+      handleTransfer(buyersAddress);
+        refetchNft();
+        refetchHistory();
+
+    };
 
   const initialValues = {
     price: "",
+    buyersAddress: "",
   };
 
   const validationSchema = yup.object().shape({
@@ -158,6 +189,11 @@ const NftItem = ({ nftId }) => {
       otherwise: yup.number(),
     }),
   });
+
+  // const validationSchema1 = yup.object().shape({
+  //   buyersAddress: yup.string().required(),
+  // });
+
 
   return (
     <>
@@ -216,6 +252,36 @@ const NftItem = ({ nftId }) => {
                       isTypeSubmit
                       size="lg"
                     />
+                  </Form>
+                )}
+              </Formik>
+              <Formik
+                initialValues={initialValues}
+                onSubmit={handleSubmit1}
+                // validationSchema={validationSchema1}
+                validateOnMount
+              >
+                {({ isValid }) => (
+                  <Form>
+                    {canTransferItem && (
+                      <Input
+                        name="buyersAddress"
+                        label="Buyer's address"
+                        placeholder="Example: 0x1E6a...a14E"
+                        errorMessage="Buyer's address is a required field"
+                        type="string"
+                      />
+                    )}
+                   {canTransferItem && (
+                    <Button
+                      label="Transfer"
+                      isDisabled={!isValid}
+                      isLoading={isLoading}
+                      className="mt-4 w-full"
+                      isTypeSubmit
+                      size="lg"
+                    />
+                   )}
                   </Form>
                 )}
               </Formik>

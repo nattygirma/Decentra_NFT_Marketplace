@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -29,6 +29,8 @@ contract NFTMarket is ReentrancyGuard {
     uint256 price;
     bool sold;
     bool listed;
+    uint256 timeItemGotListed;
+    uint256 timeItemGotSold;
   }
 
   mapping(uint256 => MarketItem) private idToMarketItem;
@@ -41,7 +43,9 @@ contract NFTMarket is ReentrancyGuard {
     address owner,
     uint256 price,
     bool sold,
-    bool listed
+    bool listed,
+    uint256 timeItemGotListed,
+    uint256 timeItemGotSold
   );
 
   /* Returns the listing price of the contract */
@@ -67,7 +71,9 @@ contract NFTMarket is ReentrancyGuard {
       payable(address(0)),
       price,
       false,
-      true
+      true,
+      block.timestamp,
+      0
     );
 
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
@@ -80,7 +86,9 @@ contract NFTMarket is ReentrancyGuard {
       address(0),
       price,
       false,
-      true
+      true,
+      block.timestamp,
+      0
     );
   }
 
@@ -99,6 +107,7 @@ contract NFTMarket is ReentrancyGuard {
     idToMarketItem[itemId].owner = payable(msg.sender);
     idToMarketItem[itemId].sold = true;
     idToMarketItem[itemId].listed = false;
+    idToMarketItem[itemId].timeItemGotSold = block.timestamp;
     _itemsSold.increment();
     payable(owner).transfer(listingPrice);
   }
@@ -118,6 +127,20 @@ contract NFTMarket is ReentrancyGuard {
     idToMarketItem[itemId].listed = false;
     payable(msg.sender).transfer(listingPrice);
   }
+
+  function transferToBuyer (    
+    address nftContract,
+    uint256 itemId,
+    address payable buyer) public payable nonReentrant {
+      uint tokenId = idToMarketItem[itemId].tokenId;
+      require(msg.sender == idToMarketItem[itemId].seller, "Only the Seller of this product can transfer the NFT");
+      IERC721(nftContract).transferFrom(address(this), buyer , tokenId);
+        idToMarketItem[itemId].owner = buyer;
+        idToMarketItem[itemId].sold = true;
+        idToMarketItem[itemId].listed = false;
+        idToMarketItem[itemId].timeItemGotSold = block.timestamp;
+        _itemsSold.increment();
+    }
 
   /* Returns all unsold market items */
   function fetchMarketItems() public view returns (MarketItem[] memory) {

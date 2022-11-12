@@ -29,6 +29,13 @@ const formatItem = (item, meta) => ({
   seller: item.seller || null,
   owner: item.owner,
   sold: item.sold,
+  timeItemGotListed: item.timeItemGotListed?._isBigNumber
+    ? item.timeItemGotListed.toNumber()
+    : item.timeItemGotListed,
+  timeItemGotSold: item.timeItemGotSold?._isBigNumber
+    ? item.timeItemGotSold.toNumber()
+    : item.timeItemGotSold,
+
   image: meta?.data.image || null,
   name: meta?.data.name || null,
   description: meta?.data.description || null,
