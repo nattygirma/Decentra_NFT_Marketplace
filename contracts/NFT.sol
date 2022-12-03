@@ -1,17 +1,21 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "contracts/NFTMarket.sol";
+
 
 import "hardhat/console.sol";
 
-contract NFT is ERC721URIStorage, ERC721Enumerable {
+
+contract NFT is NFTMarket, ERC721URIStorage, ERC721Enumerable{
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     address contractAddress;
+    
 
     constructor(address marketplaceAddress) ERC721("Metaverse", "METT") {
         contractAddress = marketplaceAddress;
@@ -53,15 +57,19 @@ contract NFT is ERC721URIStorage, ERC721Enumerable {
         setApprovalForAll(contractAddress, true);
         return newItemId;
     }
-     function createTokens(string memory IPFStokenURI, uint256 numberInACollection) public returns (uint[] memory) {
-        uint[] memory newItemId = new uint[](numberInACollection);
-        for (uint256 i = 0 ; i< numberInACollection; i++){
-            _tokenIds.increment();
-            newItemId[i] = _tokenIds.current();
-            _mint(msg.sender, newItemId[i]);
-            _setTokenURI(newItemId[i], IPFStokenURI);
-            setApprovalForAll(contractAddress, true);
-        }
+        function createTokens(string memory IPFStokenURI, uint256 numberInACollection) public returns (uint[] memory) {
+            uint[] memory newItemId = new uint[](numberInACollection);
+            uint256 currentId = _tokenIds.current();
+            NFTMarket(contractAddress).createCollection(contractAddress,currentId,numberInACollection,msg.sender);
+
+            for (uint256 i = 0 ; i< numberInACollection; i++){
+                _tokenIds.increment();
+                newItemId[i] = _tokenIds.current();
+                _mint(msg.sender, newItemId[i]);
+                _setTokenURI(newItemId[i], IPFStokenURI);
+                setApprovalForAll(contractAddress, true);
+            }
         return (newItemId);
         }
+
 }

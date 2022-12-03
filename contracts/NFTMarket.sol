@@ -12,6 +12,7 @@ contract NFTMarket is ReentrancyGuard {
   Counters.Counter private _itemIds;
   Counters.Counter private _itemsSold;
   Counters.Counter private _marketItems;
+  Counters.Counter private _collectionIds;
 
   address payable owner;
   uint256 listingPrice = 0.025 ether;
@@ -47,6 +48,16 @@ contract NFTMarket is ReentrancyGuard {
     uint256 timeItemGotListed,
     uint256 timeItemGotSold
   );
+
+  struct Collection {
+    uint collectionId;
+    uint startTokenId;
+    uint256 collectionSize;
+    address seller;
+    address nftContract;
+  }
+
+  mapping(uint256 => Collection) private idToCollection;
 
   /* Returns the listing price of the contract */
   function getListingPrice() public view returns (uint256) {
@@ -90,6 +101,20 @@ contract NFTMarket is ReentrancyGuard {
       block.timestamp,
       0
     );
+  }
+
+  function createCollection(address nftContract,uint256 currentTokenId,uint256 itemSize, address collectionSeller) public {
+    _collectionIds.increment();
+    uint256 collectionId = _collectionIds.current();
+
+    idToCollection[collectionId] = Collection(
+      collectionId,
+      currentTokenId,
+      itemSize,
+      collectionSeller,
+      nftContract
+    );
+
   }
 
   /* Creates the sale of a marketplace item */
@@ -159,11 +184,51 @@ contract NFTMarket is ReentrancyGuard {
     }
     return items;
   }
+  function fetchCollections() public view returns (Collection[] memory) {
+    uint collectionCount = _collectionIds.current();
+    uint currentIndex = 0;
+
+    Collection[] memory collections = new Collection[](collectionCount);
+    for (uint i = 0; i < collectionCount; i++) {
+        uint currentId = i + 1;
+        Collection storage currentCollection = idToCollection[currentId];
+        collections[currentIndex] = currentCollection;
+        currentIndex += 1;
+    }
+    return collections;
+  }
+
+  function fetchCollectionById(uint256 id) public view returns (Collection memory){
+    return idToCollection[id];
+  }
 
   /* Returns only items a user has created */
   function fetchItemsCreated() public view returns (MarketItem[] memory) {
     uint totalItemCount = _itemIds.current();
     uint itemCount = 0;
+    uint currentIndex = 0;
+
+    for (uint i = 0; i < totalItemCount; i++) {
+      if (idToMarketItem[i + 1].seller == msg.sender) {
+        itemCount += 1;
+      }
+    }
+
+    MarketItem[] memory items = new MarketItem[](itemCount);
+    for (uint i = 0; i < totalItemCount; i++) {
+      if (idToMarketItem[i + 1].seller == msg.sender) {
+        uint currentId = i + 1;
+        MarketItem storage currentItem = idToMarketItem[currentId];
+        items[currentIndex] = currentItem;
+        currentIndex += 1;
+      }
+    }
+    return items;
+  }
+
+    function fetchItemsInACollection(uint256 currentTokenId,uint256 itemSize) public view returns (MarketItem[] memory) {
+    uint totalItemCount = _itemIds.current();
+    uint itemCount = itemSize;
     uint currentIndex = 0;
 
     for (uint i = 0; i < totalItemCount; i++) {

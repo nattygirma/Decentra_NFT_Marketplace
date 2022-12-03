@@ -58,6 +58,13 @@ const NFTListItem = ({
     event.stopPropagation();
     onHandleAction(nft, getAction().action);
   };
+  
+  let name1;
+  if (nft.nftIdInACollection) {
+    name1 = name + " #" + nft.nftIdInACollection;
+    } else {
+     name1 = name;
+    }
 
   return (
     <li
@@ -75,7 +82,9 @@ const NFTListItem = ({
         />
       </div>
       <div className="p-2">
-        <p className="text-2xl font-semibold">{name}</p>
+        <p className="text-2xl font-semibold">
+          {name1}
+        </p>
         <div>
           <p className="text-gray-400 truncate">{description}</p>
         </div>

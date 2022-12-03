@@ -22,7 +22,7 @@ const useGetMarketNfts = () => {
       toast.error(`${error}`);
       return null;
     });
-
+// console.log("nft unorganized data",data);
     if (data) {
       const formattedItems = await Promise.all(data.map(async (item) => {
           const tokenUri = await tokenContract.tokenURI(item.tokenId);

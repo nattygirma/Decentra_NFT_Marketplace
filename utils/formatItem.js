@@ -18,11 +18,15 @@ import { CRYPTO_CURRENCY } from "./constants";
  * @returns {Object} formatted nft data
  */
 
-const formatItem = (item, meta) => ({
+const formatItem = (item, meta, nftIdInACollection1) => ({
+  //
   price: item.price
     ? ethers.utils.formatUnits(item.price?.toString(), CRYPTO_CURRENCY)
     : null,
   tokenId: item.tokenId?._isBigNumber ? item.tokenId.toNumber() : item.tokenId,
+  nftIdInACollection: nftIdInACollection1
+    ? nftIdInACollection1.nftIdInACollection
+    : null,
   itemId: item.itemId?._isBigNumber
     ? item.itemId.toNumber()
     : item.itemId || null,
@@ -40,5 +44,6 @@ const formatItem = (item, meta) => ({
   name: meta?.data.name || null,
   description: meta?.data.description || null,
 });
+
 
 export default formatItem;

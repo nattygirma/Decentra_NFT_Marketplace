@@ -3,7 +3,8 @@
 require("@nomiclabs/hardhat-waffle");
 const fs = require("fs");
 
-const infuraUrl = process.env.NEXT_PUBLIC_INFURA_API_UR;
+// const infuraUrl = process.env.NEXT_PUBLIC_INFURA_API_URL;
+const infuraUrl ="https://polygon-mumbai.infura.io/v3/e302ec24bdea44b3991eee0c5b9c3e9e";
 
 
 const privateKey =fs.readFileSync(".secret").toString().trim() || "01234567890123456789";

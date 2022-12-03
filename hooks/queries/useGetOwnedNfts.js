@@ -40,6 +40,7 @@ const useGetOwnedNfts = () => {
           return formatItem({ tokenId: item }, meta);
         })
       );
+      console.log("try", formattedItems);
       setNfts(formattedItems);
     }
 

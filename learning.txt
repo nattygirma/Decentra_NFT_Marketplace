@@ -1,5 +1,1 @@
-  // for uploading NFT to IPFS
-    const ipfsUploadData = async () => {
-      const ipfsData = await ipfsUploadMutation(uploadedImages[0]);
-      setIpfsUrl(`${`https://${INFURA_URL}`}/ipfs/${ipfsData.path}`);
-    };
+  npx hardhat run scripts/deploy.js --network mumbai
